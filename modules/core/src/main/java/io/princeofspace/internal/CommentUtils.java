@@ -28,6 +28,17 @@ final class CommentUtils {
 
     private CommentUtils() {}
 
+    /** Removes every owner of the exact comment instance within a call subtree. */
+    @SuppressWarnings({"ReferenceEquality", "PMD.CompareObjectsWithEquals"})
+    static void removeMirroredCommentOwners(MethodCallExpr methodCall, Comment comment) {
+        for (Node node : methodCall.findAll(Node.class)) {
+            // JavaParser can mirror this exact Comment instance onto the call scope, name, and arguments.
+            if (node.getComment().orElse(null) == comment) {
+                node.removeComment();
+            }
+        }
+    }
+
     /** Returns whether comments exist between two statements in the same block. */
     static boolean hasCommentBetweenStatements(BlockStmt block, Statement previous, Statement current) {
         return hasCommentBetweenStatements(block.getAllContainedComments(), previous, current);

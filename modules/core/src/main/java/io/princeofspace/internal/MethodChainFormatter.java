@@ -175,7 +175,7 @@ final class MethodChainFormatter {
                     for (Expression argument : call.getArguments()) {
                         argument.getComment().ifPresent(comment -> {
                             // Keep argument comments inside the list, without mirrored scope/name owners.
-                            removeMirroredCommentOwners(chainRoot, comment);
+                            CommentUtils.removeMirroredCommentOwners(chainRoot, comment);
                             argument.setComment(comment);
                         });
                     }
@@ -183,7 +183,7 @@ final class MethodChainFormatter {
                 Optional<Comment> hoistedComment = CommentUtils.hoistableArgumentComment(call);
                 if (hoistedComment.isPresent()) {
                     Comment comment = hoistedComment.orElseThrow();
-                    removeMirroredCommentOwners(chainRoot, comment);
+                    CommentUtils.removeMirroredCommentOwners(chainRoot, comment);
                     if (CommentUtils.hasLineOrBlockComment(call)
                             || CommentUtils.hasLineOrBlockComment(call.getName())) {
                         // Keep the argument comment inside the call when a distinct call comment remains.
@@ -195,7 +195,8 @@ final class MethodChainFormatter {
             }
         }
         Optional<Comment> hoistedBaseComment = CommentUtils.hoistableWrappedChainBaseComment(base);
-        hoistedBaseComment.ifPresent(comment -> removeMirroredCommentOwners(calls.get(calls.size() - 1), comment));
+        hoistedBaseComment.ifPresent(
+                comment -> CommentUtils.removeMirroredCommentOwners(calls.get(calls.size() - 1), comment));
         if (hoistedBaseComment.isPresent()) {
             printExpressionWithoutOwnComment(base, arg);
         } else {
@@ -301,16 +302,5 @@ final class MethodChainFormatter {
         Expression copy = expression.clone();
         copy.removeComment();
         ctx.accept(copy, arg);
-    }
-
-    /** Removes every owner of the exact comment already hoisted above its call. */
-    @SuppressWarnings({"ReferenceEquality", "PMD.CompareObjectsWithEquals"})
-    private static void removeMirroredCommentOwners(MethodCallExpr methodCall, Comment hoistedComment) {
-        for (Node node : methodCall.findAll(Node.class)) {
-            // JavaParser can mirror this exact Comment instance onto the call scope, name, and arguments.
-            if (node.getComment().orElse(null) == hoistedComment) {
-                node.removeComment();
-            }
-        }
     }
 }

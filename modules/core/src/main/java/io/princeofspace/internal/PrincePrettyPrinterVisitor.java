@@ -845,7 +845,6 @@ final class PrincePrettyPrinterVisitor extends DefaultPrettyPrinterVisitor {
     }
 
     @Override
-    @SuppressWarnings({"ReferenceEquality", "PMD.CompareObjectsWithEquals"})
     protected <T extends Expression> void printArguments(NodeList<T> args, Void arg) {
         int openerLine = printer.getCursor().line;
         boolean nestedOpenersAreColine =
@@ -874,13 +873,7 @@ final class PrincePrettyPrinterVisitor extends DefaultPrettyPrinterVisitor {
                 Expression lastArgument = args.get(args.size() - 1);
                 if (methodCall != null && CommentUtils.hasTrailingLineOrBlockComment(lastArgument)) {
                     trailingArgumentComment = lastArgument.getComment();
-                    Comment trailing = trailingArgumentComment.orElseThrow();
-                    for (Node node : methodCall.findAll(Node.class)) {
-                        // JavaParser can mirror this exact Comment instance onto multiple nodes.
-                        if (node.getComment().orElse(null) == trailing) {
-                            node.removeComment();
-                        }
-                    }
+                    CommentUtils.removeMirroredCommentOwners(methodCall, trailingArgumentComment.orElseThrow());
                 }
                 wrapped = argumentListFormatter.argsNeedWrap(args);
                 trailingLambda = wrapped && argumentListFormatter.shouldUseTrailingLambdaLayout(args);

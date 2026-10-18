@@ -7,6 +7,7 @@ import io.princeofspace.model.WrapStyle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -71,6 +72,43 @@ class CommentPreservationTest {
                             .lineLength(100)
                             .javaLanguageLevel(JavaLanguageLevel.of(25))
                             .build());
+
+    @ParameterizedTest
+    @ValueSource(strings = {"first", "\\" + "uuuu0041"})
+    void javadocsStayWithTheirFields(String firstValue) {
+        String input =
+                """
+                class T {
+                    /**
+                     * First field.
+                     *        h
+                     *       /|\\
+                     *      / | \\
+                     *     /  |  \\
+                     *    d   e   g
+                     *   /|\\      |
+                     *  / | \\     |
+                     * a  b  c    f
+                     */
+                    String first = "FIRST_VALUE";
+
+                    /** Second field. */
+                    String second = "second";
+
+                    /** Third field. */
+                    String third = "third";
+                }
+                """.replace("FIRST_VALUE", firstValue);
+
+        String output = DEFAULT.format(input);
+
+        var type = StaticJavaParser.parse(output).getType(0);
+        assertThat(type.getFieldByName("second").orElseThrow().getJavadocComment().orElseThrow().getContent())
+                .contains("Second field.");
+        assertThat(type.getFieldByName("third").orElseThrow().getJavadocComment().orElseThrow().getContent())
+                .contains("Third field.");
+        assertThat(DEFAULT.format(output)).isEqualTo(output);
+    }
 
     @Test
     void lineComment_beforeStatement_preserved() {

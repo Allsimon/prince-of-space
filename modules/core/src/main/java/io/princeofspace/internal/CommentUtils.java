@@ -393,7 +393,7 @@ final class CommentUtils {
             return Optional.empty();
         }
         Expression only = mc.getArguments().get(0);
-        if (only instanceof LambdaExpr) {
+        if (only instanceof LambdaExpr || hasTrailingLineOrBlockComment(only)) {
             return Optional.empty();
         }
         if (hasLineOrBlockComment(only)) {

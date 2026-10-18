@@ -840,6 +840,17 @@ public class FormatterShowcase
                 .trim();
     }
 
+    public String scenario56TrailingLineCommentAfterSoleArgument(String value, String suffix) {
+        return value.concat(
+                        suffix // This comment follows the sole argument.
+                        )
+                .trim();
+    }
+
+    public String scenario56TrailingBlockCommentAfterSoleArgument(String value, String suffix) {
+        return value.concat(suffix /* This comment follows the sole argument. */).trim();
+    }
+
     private String mergeSymbolicScenario56Arguments(
             String alpha, String bravo, String charlie, String delta) {
         return alpha + bravo + charlie + delta;

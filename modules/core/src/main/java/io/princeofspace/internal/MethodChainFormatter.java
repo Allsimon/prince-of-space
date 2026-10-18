@@ -171,8 +171,9 @@ final class MethodChainFormatter {
         if (!inlineSingleCall) {
             MethodCallExpr chainRoot = calls.get(calls.size() - 1);
             for (MethodCallExpr call : calls) {
-                if (call.getArguments().size() > SINGLE_ITEM_COUNT) {
-                    for (Expression argument : call.getArguments()) {
+                for (Expression argument : call.getArguments()) {
+                    if (call.getArguments().size() > SINGLE_ITEM_COUNT
+                            || CommentUtils.hasTrailingLineOrBlockComment(argument)) {
                         argument.getComment().ifPresent(comment -> {
                             // Keep argument comments inside the list, without mirrored scope/name owners.
                             CommentUtils.removeMirroredCommentOwners(chainRoot, comment);

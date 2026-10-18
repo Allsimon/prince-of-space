@@ -28,7 +28,7 @@ Scenarios **31–44** are shared control-flow and wrapping cases; they appear in
 
 **Scenario 55** (nested `static` class with two consecutive `//` line comments immediately before the first field) appears in **all** four trees. It is a regression guard against inserting a blank line between those comments when formatting type members.
 
-**Scenario 56** (wrapped method call with comments interleaved between arguments and before the closing parenthesis) appears in **all** four trees. It covers comment ordering and closing-delimiter preservation in argument lists, plus distinct line and block comments on a chained call and its argument.
+**Scenario 56** (wrapped method call with comments interleaved between arguments and before the closing parenthesis) appears in **all** four trees. It covers comment ordering and closing-delimiter preservation in argument lists, distinct line and block comments on a chained call and its argument, and trailing line and block comments after a sole argument in a method chain.
 
 **Scenario 57** (annotation array with mixed comments between elements and before the closing brace) appears in **all** four trees. It covers comment ordering and closing-delimiter preservation in annotation values.
 

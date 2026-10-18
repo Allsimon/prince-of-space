@@ -18,6 +18,38 @@ class CommentPreservationTest {
 
     @ParameterizedTest
     @EnumSource(WrapStyle.class)
+    void trailingSoleArgumentComment_staysInsideChainedCall(WrapStyle style) {
+        FormatterConfig config = FormatterConfig.builder().lineLength(120).wrapStyle(style).build();
+        String call = ".transform(";
+        for (String comment : new String[] {"// closing marker", "/* closing marker */"}) {
+            String input = """
+                    class T {
+                        Object m() {
+                            return receiver
+                                .transform(value COMMENT
+                                )
+                                .finish();
+                        }
+                    }
+                    """.replace("COMMENT", comment);
+
+            String singlePass = new Formatter(config, true).format(input);
+            assertThat(singlePass).containsOnlyOnce(comment);
+            assertThat(singlePass.indexOf(comment)).isGreaterThan(singlePass.indexOf(call));
+            assertThat(singlePass.indexOf(comment)).isLessThan(singlePass.indexOf(')', singlePass.indexOf(call)));
+
+            Formatter formatter = new Formatter(config);
+            String output = formatter.format(input);
+            assertThat(output).containsOnlyOnce(comment);
+            assertThat(output.indexOf(comment)).isGreaterThan(output.indexOf(call));
+            assertThat(output.indexOf(comment)).isLessThan(output.indexOf(')', output.indexOf(call)));
+            assertThatCode(() -> StaticJavaParser.parse(output)).doesNotThrowAnyException();
+            assertThat(formatter.format(output)).isEqualTo(output);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
     void nestedEmptyArrayCommentsWithTabs_preserveFollowingMemberIndent(WrapStyle style) {
         FormatterConfig config = FormatterConfig.builder()
                 .indentStyle(IndentStyle.TABS)

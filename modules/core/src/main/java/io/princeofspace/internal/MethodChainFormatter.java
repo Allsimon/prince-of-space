@@ -186,6 +186,7 @@ final class MethodChainFormatter {
             }
         }
         Optional<Comment> hoistedBaseComment = CommentUtils.hoistableWrappedChainBaseComment(base);
+        hoistedBaseComment.ifPresent(comment -> removeMirroredCommentOwners(calls.get(calls.size() - 1), comment));
         if (hoistedBaseComment.isPresent()) {
             printExpressionWithoutOwnComment(base, arg);
         } else {

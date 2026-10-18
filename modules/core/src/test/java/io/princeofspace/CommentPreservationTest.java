@@ -17,6 +17,34 @@ class CommentPreservationTest {
 
     @ParameterizedTest
     @EnumSource(WrapStyle.class)
+    void distinctCallAndArgumentComments_areBothPreserved(WrapStyle style) {
+        Formatter formatter = new Formatter(FormatterConfig.builder().lineLength(120).wrapStyle(style).build());
+        for (String[] comments : new String[][] {{"// CALL", "// ARG"}, {"/* CALL */", "/* ARG */"}}) {
+            String input = """
+                    class T {
+                        Object m() {
+                            return receiver
+                                CALL_COMMENT
+                                .first(
+                                    ARG_COMMENT
+                                    value)
+                                .second();
+                        }
+                    }
+                    """.replace("CALL_COMMENT", comments[0]).replace("ARG_COMMENT", comments[1]);
+
+            String output = formatter.format(input);
+
+            assertThat(output).containsOnlyOnce(comments[0]).containsOnlyOnce(comments[1]);
+            assertThat(output.indexOf(comments[0])).isLessThan(output.indexOf(".first("));
+            assertThat(output.indexOf(comments[1])).isGreaterThan(output.indexOf(".first("));
+            assertThatCode(() -> StaticJavaParser.parse(output)).doesNotThrowAnyException();
+            assertThat(formatter.format(output)).isEqualTo(output);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
     void emptyCommentsBetweenManyArguments_arePreservedAndConverge(WrapStyle style) {
         String input = """
                 class T {

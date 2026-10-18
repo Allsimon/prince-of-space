@@ -181,7 +181,16 @@ final class MethodChainFormatter {
                     }
                 }
                 Optional<Comment> hoistedComment = CommentUtils.hoistableArgumentComment(call);
-                hoistedComment.ifPresent(comment -> removeMirroredCommentOwners(chainRoot, comment));
+                if (hoistedComment.isPresent()) {
+                    Comment comment = hoistedComment.orElseThrow();
+                    removeMirroredCommentOwners(chainRoot, comment);
+                    if (CommentUtils.hasLineOrBlockComment(call)
+                            || CommentUtils.hasLineOrBlockComment(call.getName())) {
+                        // Keep the argument comment inside the call when a distinct call comment remains.
+                        call.getArgument(0).setComment(comment);
+                        hoistedComment = Optional.empty();
+                    }
+                }
                 hoistedArgumentComments.add(hoistedComment);
             }
         }

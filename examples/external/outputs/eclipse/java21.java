@@ -614,6 +614,24 @@ public class FormatterShowcase
 				"showroom-scenario-56-arg-delta-long-symbolic-suffix");
 	}
 
+	public String scenario56DistinctLineCommentsOnCallAndArgument(String value, String suffix) {
+		return value
+				// This comment describes the concat call.
+				.concat(
+						// This comment describes its argument.
+						suffix)
+				.trim();
+	}
+
+	public String scenario56DistinctBlockCommentsOnCallAndArgument(String value, String suffix) {
+		return value
+				/* This comment describes the concat call. */
+				.concat(
+						/* This comment describes its argument. */
+						suffix)
+				.trim();
+	}
+
 	private String mergeSymbolicScenario56Arguments(String alpha, String bravo, String charlie, String delta) {
 		return alpha + bravo + charlie + delta;
 	}

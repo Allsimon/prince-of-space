@@ -2,6 +2,7 @@ package io.princeofspace;
 
 import com.github.javaparser.StaticJavaParser;
 import io.princeofspace.model.FormatterConfig;
+import io.princeofspace.model.IndentStyle;
 import io.princeofspace.model.JavaLanguageLevel;
 import io.princeofspace.model.WrapStyle;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,45 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 /** Phase 5: comments survive formatting and formatting is idempotent when comments are present. */
 class CommentPreservationTest {
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
+    void nestedEmptyArrayCommentsWithTabs_preserveFollowingMemberIndent(WrapStyle style) {
+        FormatterConfig config = FormatterConfig.builder()
+                .indentStyle(IndentStyle.TABS)
+                .indentSize(1)
+                .wrapStyle(style)
+                .javaLanguageLevel(JavaLanguageLevel.of(25))
+                .build();
+        String input = """
+                class T {
+                    int[][] values = {{
+                        // Empty row.
+                        /* No elements. */
+                    }};
+                    int following = 1;
+                    void after() {
+                        int local = 2;
+                    }
+                }
+                """;
+
+        String output = new Formatter(config, true).format(input);
+
+        assertThat(output).containsOnlyOnce("// Empty row.");
+        assertThat(output).containsOnlyOnce("/* No elements. */");
+        assertThat(output).contains("\n\tint following = 1;");
+        assertThat(output).contains("\n\tvoid after() {\n\t\tint local = 2;\n\t}");
+        String openingLine = output.lines().filter(line -> line.contains("int[][] values =")).findFirst().orElseThrow();
+        String closingLine = output.lines().filter(line -> line.stripLeading().startsWith("}")).findFirst().orElseThrow();
+        assertThat(closingLine.replace("\t", "    ").indexOf('}'))
+                .isEqualTo(openingLine.replace("\t", "    ").lastIndexOf('{'));
+        Formatter formatter = new Formatter(config);
+        String stable = formatter.format(input);
+        assertThat(stable).containsOnlyOnce("// Empty row.").containsOnlyOnce("/* No elements. */");
+        assertThat(stable).contains("\n\tint following = 1;");
+        assertThat(formatter.format(stable)).isEqualTo(stable);
+    }
 
     @ParameterizedTest
     @EnumSource(WrapStyle.class)

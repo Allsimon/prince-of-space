@@ -7,6 +7,7 @@ import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.Expression;
 import io.princeofspace.model.FormatterConfig;
+import io.princeofspace.model.IndentStyle;
 import io.princeofspace.model.WrapStyle;
 
 import java.util.Iterator;
@@ -63,6 +64,16 @@ final class ArrayInitializerFormatter {
                 printInlineInitializer(n, arg);
                 ctx.print("}");
             }
+        } else if (hasOrphanComments && nestedArrayInitializer && fmt.indentStyle() == IndentStyle.TABS) {
+            // Save the closing alignment before comment printing changes SourcePrinter's last indent.
+            int nestedOpenBraceColumn = ctx.column() - 1;
+            ctx.indentWithAlignToSafe(nestedOpenBraceColumn);
+            ctx.println();
+            ctx.indentWithAlignToSafe(nestedOpenBraceColumn + fmt.continuationIndentSize());
+            ctx.printOrphanCommentsEnding(n);
+            ctx.unindent();
+            ctx.print("}");
+            ctx.unindent();
         } else if (hasOrphanComments) {
             ctx.println();
             if (nestedArrayInitializer) {

@@ -780,7 +780,10 @@ public class FormatterShowcase
                      */
                     "showroom-scenario58-r1-c1-extra-long-handle",
                     "showroom-scenario58-r1-c2-extra-long-handle"
-            }};
+            }, {
+                       // This row is intentionally empty.
+                       /* Keep comments inside the empty initializer. */
+               }};
 
     // Scenario 59: Enum with long implements list (additional Java 17+ record echoes implements clause in sibling trees)
     enum Scenario59PipelineStage

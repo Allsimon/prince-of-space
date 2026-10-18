@@ -755,6 +755,10 @@ public class FormatterShowcase
             /* intra-row block anchors between cells when commas wrap independently */
             "showroom-scenario58-r1-c1-extra-long-handle",
             "showroom-scenario58-r1-c2-extra-long-handle"
+        },
+        {
+            // This row is intentionally empty.
+            /* Keep comments inside the empty initializer. */
         }
     };
 

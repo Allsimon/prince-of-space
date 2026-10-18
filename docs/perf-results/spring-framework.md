@@ -1,6 +1,6 @@
 # Formatter throughput — Spring Framework corpus
 
-Date: 2026-10-17
+Date: 2026-10-18
 Corpus root (local): `/home/runner/work/prince-of-space/prince-of-space/spring-framework-bench`
 Git revision: `49adc91`
 Files formatted: **9263**
@@ -13,11 +13,11 @@ Prince of Space uses `FormatterConfig.defaults()` (line length **120**, wrap **B
 
 | Formatter | Avg ms / file | Failures |
 |-----------|-----------------|----------|
-| Prince of Space (strict, fixed-point) | 4.48 | 0 |
-| Prince of Space (fast, single pass) | 1.82 | 0 |
-| Google Java Format (AOSP) | 1.99 | 0 |
-| Palantir Java Format (AOSP) | 1.94 | 0 |
-| Eclipse JDT (Spotless default) | 1.54 | 0 |
+| Prince of Space (strict, fixed-point) | 5.95 | 0 |
+| Prince of Space (fast, single pass) | 2.48 | 0 |
+| Google Java Format (AOSP) | 2.53 | 0 |
+| Palantir Java Format (AOSP) | 2.63 | 0 |
+| Eclipse JDT (Spotless default) | 1.92 | 0 |
 
 ## Tool versions
 

@@ -3,13 +3,65 @@ package io.princeofspace;
 import com.github.javaparser.StaticJavaParser;
 import io.princeofspace.model.FormatterConfig;
 import io.princeofspace.model.JavaLanguageLevel;
+import io.princeofspace.model.WrapStyle;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 /** Phase 5: comments survive formatting and formatting is idempotent when comments are present. */
 class CommentPreservationTest {
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
+    void emptyCommentsBetweenManyArguments_arePreservedAndConverge(WrapStyle style) {
+        String input = """
+                class T {
+                    void m() {
+                        receiver.call(//
+                                Alpha.class,//
+                                Bravo.class,//
+                                Charlie.class,//
+                                Delta.class,//
+                                Echo.class,//
+                                Foxtrot.class,//
+                                Golf.class,//
+                                Hotel.class,//
+                                India.class,//
+                                Juliet.class,//
+                                Kilo.class,//
+                                Lima.class,//
+                                Mike.class,//
+                                November.class//
+                        );
+                    }
+                }
+                """;
+        Formatter formatter = new Formatter(FormatterConfig.builder().lineLength(120).wrapStyle(style).build());
+
+        String output = formatter.format(input);
+
+        assertThat(StaticJavaParser.parse(output).getAllContainedComments()).hasSize(15);
+        assertThat(formatter.format(output)).isEqualTo(output);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
+    void commentsBeforeLaterShortArguments_stayInsideCall(WrapStyle style) {
+        Formatter formatter = new Formatter(FormatterConfig.builder().lineLength(120).wrapStyle(style).build());
+        for (String comment : new String[] {"//", "// second argument"}) {
+            String input = "class T {void m(){receiver.call(1,\n" + comment + "\n2);}}";
+
+            String output = formatter.format(input);
+
+            assertThat(StaticJavaParser.parse(output).getAllContainedComments()).hasSize(1);
+            assertThat(output.indexOf(comment)).isGreaterThan(output.indexOf("call("));
+            assertThat(output.indexOf(comment)).isLessThan(output.indexOf("2"));
+            assertThat(formatter.format(output)).isEqualTo(output);
+        }
+    }
 
     private static final Formatter DEFAULT = new Formatter(FormatterConfig.defaults());
     private static final Formatter JAVA_25 =

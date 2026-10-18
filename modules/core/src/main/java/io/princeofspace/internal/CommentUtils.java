@@ -378,16 +378,7 @@ final class CommentUtils {
 
     /** Returns a comment candidate that should be hoisted before wrapped call arguments. */
     static Optional<Comment> hoistableArgumentComment(MethodCallExpr mc) {
-        if (mc.getArguments().isEmpty()) {
-            return Optional.empty();
-        }
-        if (mc.getArguments().size() > SINGLE_ARGUMENT_COUNT) {
-            for (Expression argument : mc.getArguments()) {
-                Optional<Comment> comment = argument.getComment();
-                if (comment.isPresent() && isEmptyLineOrBlockComment(comment.get())) {
-                    return comment;
-                }
-            }
+        if (mc.getArguments().size() != SINGLE_ARGUMENT_COUNT) {
             return Optional.empty();
         }
         Expression only = mc.getArguments().get(0);

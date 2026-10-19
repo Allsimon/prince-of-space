@@ -846,11 +846,12 @@ public class FormatterShowcase
     }
 
     public String scenario56TrailingBlockCommentAfterSoleArgument(String value, String suffix) {
-        return value
-            .concat(suffix
-            /* This comment follows the sole argument. */
-            )
-            .trim();
+        return value.concat(suffix /* This comment follows the sole argument. */).trim();
+    }
+
+    public String scenario56InlineCommentsBetweenTokens() {
+        String /* domain */ serviceName = null /* use default */;
+        return mergeSymbolicScenario56Arguments(null /* serviceName */, serviceName, "operation", "resource") /* combined */;
     }
 
     private String mergeSymbolicScenario56Arguments(String alpha, String bravo, String charlie, String delta) {

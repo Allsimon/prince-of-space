@@ -939,15 +939,14 @@ final class PrincePrettyPrinterVisitor extends DefaultPrettyPrinterVisitor {
                     // A single wrapped expression argument (e.g. new X("""...""".formatted(...))) must not
                     // activate the scope: inner chains/binary continuations still use printCont relative to the
                     // outer call indent.
-                    applyWrappedListIndent =
-                            wrapped
+                    boolean commentedSingleArgument = args.size() == SINGLE_ITEM_COUNT
+                            && (CommentUtils.hasLeadingLineOrBlockComment(args.get(0))
+                                    || CommentUtils.hasAnyLineOrBlockCommentOnLambda(args.get(0)));
+                    // Leading comments force a continuation even when the argument fits within the line length.
+                    applyWrappedListIndent = commentedSingleArgument
+                            || (wrapped
                                     && (args.size() > SINGLE_ITEM_COUNT
-                                            || (args.size() == SINGLE_ITEM_COUNT
-                                                    && (CommentUtils.hasLeadingLineOrBlockComment(args.get(0))
-                                                            || CommentUtils.hasAnyLineOrBlockCommentOnLambda(
-                                                                    args.get(0))
-                                                            || argumentListFormatter.shouldBreakBeforeSingleWrappedArg(
-                                                                    args.get(0)))));
+                                            || argumentListFormatter.shouldBreakBeforeSingleWrappedArg(args.get(0))));
                 }
             }
             try (LayoutContext.SilentCloseable ignored =

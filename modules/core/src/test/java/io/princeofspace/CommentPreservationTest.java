@@ -7,6 +7,7 @@ import io.princeofspace.model.JavaLanguageLevel;
 import io.princeofspace.model.WrapStyle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -88,9 +89,14 @@ class CommentPreservationTest {
     }
 
     @ParameterizedTest
-    @EnumSource(WrapStyle.class)
-    void distinctCallAndArgumentComments_areBothPreserved(WrapStyle style) {
-        Formatter formatter = new Formatter(FormatterConfig.builder().lineLength(120).wrapStyle(style).build());
+    @CsvSource({"WIDE, SPACES", "NARROW, SPACES", "BALANCED, SPACES", "WIDE, TABS", "NARROW, TABS", "BALANCED, TABS"})
+    void distinctCallAndArgumentComments_areBothPreservedAndAligned(WrapStyle style, IndentStyle indentStyle) {
+        FormatterConfig config = FormatterConfig.builder()
+                .lineLength(120)
+                .wrapStyle(style)
+                .indentStyle(indentStyle)
+                .build();
+        Formatter formatter = new Formatter(config);
         for (String[] comments : new String[][] {{"// CALL", "// ARG"}, {"/* CALL */", "/* ARG */"}}) {
             String input = """
                     class T {
@@ -104,6 +110,12 @@ class CommentPreservationTest {
                         }
                     }
                     """.replace("CALL_COMMENT", comments[0]).replace("ARG_COMMENT", comments[1]);
+
+            String singlePass = new Formatter(config, true).format(input);
+            String commentLine = singlePass.lines().filter(line -> line.contains(comments[1])).findFirst().orElseThrow();
+            String argumentLine = singlePass.lines().filter(line -> line.stripLeading().startsWith("value)")).findFirst().orElseThrow();
+            assertThat(argumentLine.substring(0, argumentLine.indexOf("value)")))
+                    .isEqualTo(commentLine.substring(0, commentLine.indexOf(comments[1])));
 
             String output = formatter.format(input);
 

@@ -802,7 +802,7 @@ public class FormatterShowcase
             // This comment describes the concat call.
             .concat(
                     // This comment describes its argument.
-            suffix)
+                    suffix)
             .trim();
     }
 
@@ -811,7 +811,7 @@ public class FormatterShowcase
             /* This comment describes the concat call. */
             .concat(
                     /* This comment describes its argument. */
-            suffix)
+                    suffix)
             .trim();
     }
 

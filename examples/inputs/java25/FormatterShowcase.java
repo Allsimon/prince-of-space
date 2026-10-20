@@ -544,6 +544,10 @@ public class FormatterShowcase implements Comparable<FormatterShowcase>, java.io
                 ).trim();
     }
 
+    public long scenario56InlineCommentsInEmptyCalls() {
+        return items.stream(/* All items. */).count(/* Count items. */);
+    }
+
     public String scenario56InlineCommentsBetweenTokens() {
         String /* domain */ serviceName = null /* use default */;
         return mergeSymbolicScenario56Arguments(null /* serviceName */, serviceName, "operation", "resource") /* combined */;

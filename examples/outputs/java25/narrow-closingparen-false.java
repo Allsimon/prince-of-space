@@ -835,6 +835,10 @@ public class FormatterShowcase
         return value.concat(suffix /* This comment follows the sole argument. */).trim();
     }
 
+    public long scenario56InlineCommentsInEmptyCalls() {
+        return items.stream(/* All items. */).count(/* Count items. */);
+    }
+
     public String scenario56InlineCommentsBetweenTokens() {
         String /* domain */ serviceName = null /* use default */;
         return mergeSymbolicScenario56Arguments(null /* serviceName */, serviceName, "operation", "resource") /* combined */;

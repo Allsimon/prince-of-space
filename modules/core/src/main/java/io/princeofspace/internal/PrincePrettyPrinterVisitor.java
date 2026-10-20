@@ -916,6 +916,9 @@ final class PrincePrettyPrinterVisitor extends DefaultPrettyPrinterVisitor {
                         .map(MethodCallExpr.class::cast)
                         .orElse(null);
         try {
+            if (methodCall != null) {
+                inlineBlockComments.printEmptyArguments(methodCall, printer);
+            }
             if (!isNullOrEmpty(args)) {
                 Expression lastArgument = args.get(args.size() - 1);
                 if (methodCall != null && CommentUtils.hasTrailingLineOrBlockComment(lastArgument)) {

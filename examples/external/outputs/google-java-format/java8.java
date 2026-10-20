@@ -665,6 +665,10 @@ public class FormatterShowcase
         return value.concat(suffix /* This comment follows the sole argument. */).trim();
     }
 
+    public long scenario56InlineCommentsInEmptyCalls() {
+        return items.stream(/* All items. */ ).count(/* Count items. */ );
+    }
+
     private String mergeSymbolicScenario56Arguments(
             String alpha, String bravo, String charlie, String delta) {
         return alpha + bravo + charlie + delta;

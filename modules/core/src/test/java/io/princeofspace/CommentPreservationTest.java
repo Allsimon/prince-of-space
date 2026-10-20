@@ -19,6 +19,36 @@ class CommentPreservationTest {
 
     @ParameterizedTest
     @EnumSource(WrapStyle.class)
+    void inlineBlockCommentsInEmptyCalls_stayInsideParentheses(WrapStyle style) {
+        FormatterConfig config = FormatterConfig.builder().wrapStyle(style).build();
+        String input = """
+                class T {
+                    void m() {
+                        f(/* c */);
+                        receiver.first(/* first */).second(/* second */ /* last */);
+                        g(
+                            /* separate */
+                        );
+                        h(
+                            // line comment
+                        );
+                    }
+                }
+                """;
+
+        String singlePass = new Formatter(config, true).format(input);
+        assertThat(singlePass).contains("f(/* c */)", ".first(/* first */)", ".second(/* second */ /* last */)");
+        assertThat(singlePass).containsPattern("g\\(\\R\\h*/\\* separate \\*/\\R\\h*\\)");
+        assertThat(singlePass).containsPattern("h\\(\\R\\h*// line comment\\R\\h*\\)");
+        Formatter formatter = new Formatter(config);
+        String output = formatter.format(input);
+        assertThat(output).isEqualTo(singlePass);
+        assertThat(formatter.format(output)).isEqualTo(output);
+        assertThatCode(() -> StaticJavaParser.parse(output)).doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
     void trailingSoleArgumentComment_staysInsideChainedCall(WrapStyle style) {
         FormatterConfig config = FormatterConfig.builder().lineLength(120).wrapStyle(style).build();
         String call = ".transform(";

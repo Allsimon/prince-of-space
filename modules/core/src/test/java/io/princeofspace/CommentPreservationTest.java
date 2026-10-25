@@ -252,6 +252,76 @@ class CommentPreservationTest {
         assertThat(DEFAULT.format(output)).isEqualTo(output);
     }
 
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
+    void consecutiveLineCommentsBetweenChainCalls_preservedInOrder(WrapStyle style) {
+        Formatter formatter = new Formatter(FormatterConfig.builder()
+                .wrapStyle(style)
+                .javaLanguageLevel(JavaLanguageLevel.of(25))
+                .build());
+        String input = """
+                class Repro {
+                    Object configure(Builder b) {
+                        return b
+                                .first()
+                                // Comment A, line one of two, explaining why the second call
+                                // comes next: line two of two.
+                                .second()
+                                // Single-line comment B.
+                                .third();
+                    }
+                }
+                """;
+        String expected = """
+                class Repro {
+                    Object configure(Builder b) {
+                        return b
+                            .first()
+                            // Comment A, line one of two, explaining why the second call
+                            // comes next: line two of two.
+                            .second()
+                            // Single-line comment B.
+                            .third();
+                    }
+                }
+                """;
+
+        String out = formatter.format(input);
+
+        assertThat(out).isEqualTo(expected);
+        assertThatCode(() -> StaticJavaParser.parse(out)).doesNotThrowAnyException();
+        assertThat(formatter.format(out)).isEqualTo(out);
+    }
+
+    @ParameterizedTest
+    @EnumSource(WrapStyle.class)
+    void threeLineCommentGroupsBetweenChainCalls_preservedOnce(WrapStyle style) {
+        Formatter formatter = new Formatter(FormatterConfig.builder().wrapStyle(style).build());
+        String input = """
+                class T {
+                    Object configure(Builder b) {
+                        return b.first()
+                            // A1
+                            // A2
+                            // A3
+                            .second()
+                            // B1
+                            // B2
+                            // B3
+                            .third();
+                    }
+                }
+                """;
+
+        String out = formatter.format(input);
+
+        assertThat(out).contains(".first()\n            // A1\n            // A2\n            // A3\n            .second()");
+        assertThat(out).contains(".second()\n            // B1\n            // B2\n            // B3\n            .third()");
+        assertThat(out).containsOnlyOnce("// A1").containsOnlyOnce("// A2").containsOnlyOnce("// A3")
+                .containsOnlyOnce("// B1").containsOnlyOnce("// B2").containsOnlyOnce("// B3");
+        assertThat(formatter.format(out)).isEqualTo(out);
+    }
+
     @Test
     void lineComment_beforeStatement_preserved() {
         String input =

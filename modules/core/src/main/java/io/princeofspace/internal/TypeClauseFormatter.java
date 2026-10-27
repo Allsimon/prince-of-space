@@ -70,22 +70,17 @@ final class TypeClauseFormatter {
     }
 
     /**
-     * Permits-specific wrapping: first continuation line is {@code permits <first>}; further types use
-     * continuation indent when {@link WrapStyle#BALANCED}, narrow indent otherwise.
+     * Permits-specific wrapping: {@code permits} stays on the declaration line and every type goes on
+     * its own continuation line.
      */
     private void permitsBrokenRest(NodeList<ClassOrInterfaceType> types, Void arg) {
-        ctx.println();
-        ctx.printCont();
-        ctx.print("permits ");
-        ctx.accept(types.get(0), arg);
-        for (int i = 1; i < types.size(); i++) {
-            ctx.print(",");
-            ctx.println();
-            if (fmt.wrapStyle() == WrapStyle.BALANCED) {
-                ctx.printCont();
-            } else {
-                ctx.printNarrowListIndent();
+        ctx.print(" permits");
+        for (int i = 0; i < types.size(); i++) {
+            if (i > 0) {
+                ctx.print(",");
             }
+            ctx.println();
+            ctx.printCont();
             ctx.accept(types.get(i), arg);
         }
     }
@@ -191,7 +186,10 @@ final class TypeClauseFormatter {
             return false;
         }
         if (fmt.wrapStyle() == WrapStyle.WIDE) {
-            wideContinuationGreedyKeywordTypes("permits ", types, arg);
+            ctx.print(" permits");
+            ctx.println();
+            ctx.printCont();
+            printTypeListGreedy(types, arg);
             return true;
         }
         permitsBrokenRest(types, arg);

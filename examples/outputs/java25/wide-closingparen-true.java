@@ -1194,8 +1194,8 @@ public class FormatterShowcase
     }
 
     // Scenario 78: Sealed class with long permits clause and final subclasses
-    static sealed class Scenario78SealedHierarchyRoot
-            permits Scenario78SealedHierarchyRoot.AlphaExtraLongSymbolicHandle,
+    static sealed class Scenario78SealedHierarchyRoot permits
+            Scenario78SealedHierarchyRoot.AlphaExtraLongSymbolicHandle,
             Scenario78SealedHierarchyRoot.BravoExtraLongSymbolicHandle,
             Scenario78SealedHierarchyRoot.CharlieExtraLongSymbolicHandle,
             Scenario78SealedHierarchyRoot.DeltaExtraLongSymbolicHandle,

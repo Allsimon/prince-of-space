@@ -177,6 +177,16 @@ Scoped method-chain receivers remain the carve-out and may stay inline after `(`
 
 **Wrapped type clauses:** When `implements`, `extends`, or `permits` lists wrap across lines, the **`{`** that begins the class/interface/record body uses the same idea: with `closingParenOnNewLine=true`, the `{` is typically alone on the line after the last type; with `false`, `{` stays on the same line as the last type (K&R style). There is no `)` in a type clause, but the config name reflects the shared “closing delimiter” behavior.
 
+A wrapped `permits` clause keeps the keyword on the declaration line and lists the permitted types below it:
+
+```java
+static sealed class Root permits
+        Root.AlphaExtraLongSymbolicHandle,
+        Root.BravoExtraLongSymbolicHandle,
+        Root.CharlieExtraLongSymbolicHandle
+{
+```
+
 Since continuation indent is always `2 * indentSize`, wrapped parameters are always visually distinct from the method body regardless of the `closingParenOnNewLine` setting.
 
 **Config:** `closingParenOnNewLine: true|false`

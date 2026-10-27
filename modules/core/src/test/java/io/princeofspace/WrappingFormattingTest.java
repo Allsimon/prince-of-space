@@ -388,10 +388,10 @@ class WrappingFormattingTest {
         assertThat(out)
                 .contains(
                         """
-                        sealed interface Shape
-                                permits Shape.Circle,
-                                        Shape.Rectangle,
-                                        Shape.Triangle {""");
+                        sealed interface Shape permits
+                                Shape.Circle,
+                                Shape.Rectangle,
+                                Shape.Triangle {""");
         assertThat(f.format(out)).isEqualTo(out);
     }
 
